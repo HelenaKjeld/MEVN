@@ -1,0 +1,25 @@
+#1
+
+
+
+# Install tailwindcss
+    - npm install -D tailwindcss postcss autoprefixer
+    - npx tailwindcss init -p
+
+
+    -- Configure Tailwind to remove unused styles in production: In your tailwind.config.js file, add the paths to all of your template files:
+        module.exports = {
+          content: [
+            './index.html',
+            './src/**/*.{vue,js,ts,jsx,tsx}',
+          ],
+          theme: {
+            extend: {},
+          },
+          plugins: [],
+        }
+
+    - add to main.css
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;

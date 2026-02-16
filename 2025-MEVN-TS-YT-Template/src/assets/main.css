@@ -1,0 +1,49 @@
+@import './base.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --full-width: 100%;
+
+  --linkColor: #63a9cd;
+  --linkColorHover: #65f6fe;
+  --input-field-color: #39ebb3;
+
+}
+* {
+  box-sizing: border-box !important;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: var(--linkColor);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    color: var(--linkColorHover);
+  }
+}
+
+@media (width > 1024px) {
+  body {
+    display: flex;
+
+  }
+
+  #app {
+  /*   width: var(--full-width); */
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
