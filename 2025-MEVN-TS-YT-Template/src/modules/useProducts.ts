@@ -29,10 +29,40 @@ export const useProducts = () => {
     }
   };
 
+  const deleteProduct = async (id: string): Promise<void> => {
+    try {
+        const token = localStorage.getItem("IsToken")
+        if (!token) {
+            throw new Error("No token found")
+        }
+        console.log("id test", id)
+        const response = await fetch(`https://ments-restapi.onrender.com/api/products/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "auth-token": token
+                }
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error("Failed to delete product")
+        }
+
+
+        products.value = products.value.filter(product => product._id !== id) // _id or id ??
+        console.log("Product deleted successfully", id)
+
+    }
+    catch (err) {
+      error.value = (err as Error).message;
+    }
+}
   return {
     error,
     loading,
     products,
     fetchProducts,
+    deleteProduct
   };
 };

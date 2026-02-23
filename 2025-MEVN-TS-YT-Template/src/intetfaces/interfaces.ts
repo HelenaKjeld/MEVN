@@ -10,3 +10,11 @@ export type Product = {
   discountPct: number;
   isHidden: boolean;
 }
+
+export type User = {
+  id: string,
+  name: string,
+  email: string,
+  password: string,
+  registerDate: string
+}
