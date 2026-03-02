@@ -11,6 +11,8 @@ export type Product = {
   isHidden: boolean;
 }
 
+
+
 export type User = {
   id: string,
   name: string,

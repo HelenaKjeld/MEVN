@@ -39,7 +39,7 @@ export const useUsers = () => {
             isLoggedIn.value = true
 
             localStorage.setItem('IsToken', authResponse.data.token)
-            localStorage.setItem('userIDToken', authResponse.data.userID)
+            localStorage.setItem('userIDToken', authResponse.data.userId)
             console.log('User is logged in:', authResponse)
             console.log('token', token.value)
         }
