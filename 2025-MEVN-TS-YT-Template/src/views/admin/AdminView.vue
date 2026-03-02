@@ -6,7 +6,7 @@
     <div v-else class="flex flex-wrap -mx-2">                                    <!-- add new product section -->
     <div class="my-8 p-2 w-full">
       <h2 class="text-2xl font-semibold mb-4">Add Product</h2>
-      <form @submit.prevent="addProduct">                                                               <!-- Add product form -->
+      <form @submit.prevent="addProductHandler">                                                               <!-- Add product form -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input type="text" v-model="newProduct.name" placeholder="Name" class="p-2 border rounded" />         <!-- Product name -->
           <span  class="absolute text-red-500 text-xs ml-2">Can't be empty</span> <!-- Error message & validate -->
@@ -83,16 +83,17 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { useProducts } from '../../modules/useProducts'
 
-const { products, error, loading, fetchProducts, deleteProduct, addProduct } = useProducts()
+const { products, error, loading, fetchProducts, deleteProduct, addProduct, getTokenAndUserId } = useProducts()
 
 onMounted(() => {
   fetchProducts()
 })
 
-const newProduct = {
+const newProduct = ref({
   name: '',
   description: '',
   price: 0,
@@ -100,7 +101,17 @@ const newProduct = {
   discount: false,
   discountPct: 0,
   isHidden: false,
-  imageURL: ''
+  imageURL: '',
+  _createdBy: ''
+})
+
+const addProductHandler = async () => {
+  const { userId } = getTokenAndUserId(); // import the userId from the useProducts module
+  newProduct.value._createdBy = userId; // Set the _createdBy field to the userId or an empty string if userId is undefined
+  await addProduct(newProduct.value)
+  newProduct.value = {
+    ...newProduct.value,
+  }
 }
 
 </script>

@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import type { Product } from "../intetfaces/interfaces";
+import type { Product, NewProduct } from "../intetfaces/interfaces";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -30,9 +30,8 @@ export const useProducts = () => {
     }
   };
 
-  const addProduct = async (/** */): Promise<void> => {
-      try { 
-        const token = localStorage.getItem("IsToken");
+  const getTokenAndUserId = (): { token: string; userId: string } => {
+     const token = localStorage.getItem("IsToken");
         const userId = localStorage.getItem("UserIdToken");
         if (!token) {
           throw new Error("No token found");
@@ -40,6 +39,35 @@ export const useProducts = () => {
         if (!userId) {
           throw new Error("No user ID found");
         }
+        return { token, userId };
+  }
+
+  const validateProduct = (product: NewProduct):void => {
+    if (!product.name) {
+      throw new Error("Product name is required");
+    }
+  }
+
+  const setDefaultValues = (product: NewProduct, userId: string) => {
+    return {
+      name: product.name,
+      description: product.description  || 'Diva, omg this is the best product ever',
+      imageURL: product.imageURL || 'https://picsum.photos/500/500',
+      price: product.price || 2,
+      stock: product.stock || 45,
+      discount: product.discount || false,
+      discountPct: product.discountPct || 0,
+      isHidden: product.isHidden || false,
+      _createdBy: userId
+    }
+  }
+
+
+  const addProduct = async (product: NewProduct): Promise<void> => {
+      try { 
+        const { token, userId } = getTokenAndUserId();
+        validateProduct(product)
+        const productWithDefaults = setDefaultValues(product, userId)
 
         const response = await fetch(`${apiUrl}/products`, {
           method: "POST",
@@ -47,17 +75,7 @@ export const useProducts = () => {
             "Content-Type": "application/json",
             "auth-token": token,
           },
-          body: JSON.stringify({
-            name: "Diva",
-            description: "Description of the new DIVA",
-            imageURL: "https://picsum.photos/500/500",
-            price: 2,
-            stock: 45, 
-            discount: false,
-            discountPct: 0,
-            isHidden: false,
-            _createdBy: userId, 
-          }),
+          body: JSON.stringify(productWithDefaults)
         })
 
         if (!response.ok) {
@@ -78,14 +96,8 @@ export const useProducts = () => {
   };
 
 
-  const deleteProduct = async (id: string): Promise<void> => {
-    try {
-      const token = localStorage.getItem("IsToken");
-      if (!token) {
-        throw new Error("No token found");
-      }
-      console.log("id test", id);
-      const response = await fetch(`${apiUrl}/${id}`, {
+  const deleteProductFromServer = async (id: string, token: string): Promise<void> => {
+    const response = await fetch(`${apiUrl}/${id}`, {
         method: "DELETE",
         headers: {
           "auth-token": token,
@@ -93,11 +105,27 @@ export const useProducts = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete product");
+        console.log("Failed to delete product", id)
+        throw new Error("Failed to delete product")
       }
+  }
 
-      products.value = products.value.filter((product) => product._id !== id); // _id or id ??
+  const removeProductFromState = (id: string): void => {
+    products.value = products.value.filter((product) => product._id !== id); // _id or id ??
       console.log("Product deleted successfully", id);
+  }
+
+  const deleteProduct = async (id: string): Promise<void> => {
+    try {
+      
+      const { token } = getTokenAndUserId()
+
+      console.log("id test", id)
+      await deleteProductFromServer(id, token)
+      removeProductFromState(id)
+
+      console.log("id test", id)
+
     } catch (err) {
       error.value = (err as Error).message;
     } finally {
@@ -112,7 +140,11 @@ export const useProducts = () => {
     products,
     fetchProducts,
     deleteProduct,
-    addProduct
+    addProduct,
+    setDefaultValues,
+    validateProduct,
+
+    getTokenAndUserId
   };
 };
 
