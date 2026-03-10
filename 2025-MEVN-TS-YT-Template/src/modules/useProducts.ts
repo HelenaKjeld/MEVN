@@ -133,6 +133,46 @@ export const useProducts = () => {
     }
   };
 
+  const updateProductOnServer = async (id: string, updateProduct: Partial<Product> token: string): Promise<Product> => {
+    const response = await fetch(`${apiUrl}/products/${id}`, {
+      method: 'Put',
+      header: {
+        'Content-Type': 'application/json',
+        'auth-token': token,
+      },
+      body: JSON.stringify(updateProduct)
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to update product')
+    }
+
+    const responseTest = await response.text()
+    try {
+      return JSON.parse(responseTest) 
+    }
+    catch {
+      return { messeage: responseTest } as unknown as Product
+    }
+      
+  };
+
+  const updateProductInState = (id: string, updatedProduct: Product): void => {
+    const index = products.value.findIndex((product) => product._id === id);
+    if (index !== -1) {
+      products.value[index] = updatedProduct;
+    }
+  }
+
+  const updateProduct = async (id: string, updateProduct: Partial<Product>): Promise<void> => {
+    try {
+      const { token } = getTokenAndUserId()
+      const updatedProductResponse = await updateProductOnServer(id, updateProduct, token)
+      updateProductInState(id, updatedProductResponse)
+      await fetchProducts()
+    }
+  }
+
 
   return {
     error,
@@ -141,6 +181,7 @@ export const useProducts = () => {
     fetchProducts,
     deleteProduct,
     addProduct,
+    updateProduct,
     setDefaultValues,
     validateProduct,
 

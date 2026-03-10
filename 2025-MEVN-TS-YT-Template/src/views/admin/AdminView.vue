@@ -72,7 +72,7 @@
         <div class="mt-4 flex space-x-2"> <!-- Update and delete buttons -->
           <p>ID:  </p> <!-- Product ID for testing -->
           <button @click="deleteProduct(product._id)" class="bg-red-600 text-white p-2 rounded hover:bg-red-700">Delete</button> <!-- Delete button -->
-          <button  class="bg-green-600 text-white p-2 rounded hover:bg-green-700">Edit</button> <!-- Edit button -->
+          <button @click="updateProduct(product)"  class="bg-green-600 text-white p-2 rounded hover:bg-green-700">Edit</button> <!-- Edit button -->
          </div>
       </div>
     </div>
@@ -86,8 +86,10 @@
 import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { useProducts } from '../../modules/useProducts'
+import type { Product } from '@/intetfaces/interfaces'
 
-const { products, error, loading, fetchProducts, deleteProduct, addProduct, getTokenAndUserId } = useProducts()
+
+const { products, error, loading, fetchProducts, deleteProduct, addProduct, getTokenAndUserId, updateProduct } = useProducts()
 
 onMounted(() => {
   fetchProducts()
@@ -112,6 +114,20 @@ const addProductHandler = async () => {
   newProduct.value = {
     ...newProduct.value,
   }
+}
+
+const updateProductHandler = async (product: Product) => {
+  const updateProduct{
+    name: product.name,
+    description: product.description,
+    imageURL: product.imageURL,
+    price: product.price,
+    stock: product.stock,
+    discount: product.discount,
+    discountPct: product.discountPct,
+    isHidden: product.isHidden,
+  }
+  await updateProduct(product._id, updateProduct)
 }
 
 </script>
