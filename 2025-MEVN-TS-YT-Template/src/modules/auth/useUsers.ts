@@ -1,10 +1,11 @@
 import { ref } from "vue";
 import type { User } from "../../intetfaces/interfaces";
+import { state } from "../globalState/state";
 
 export const useUsers = () => {
   
     const token = ref<string | null>(null);
-    const isLoggedIn = ref<boolean>(false);
+    // const isLoggedIn = ref<boolean>(false);
     const error = ref<string | null>(null);
     const user = ref<User | null>(null);
 
@@ -36,7 +37,7 @@ export const useUsers = () => {
             const authResponse = await response.json()
             token.value = authResponse.data.token
             user.value = authResponse.data.user
-            isLoggedIn.value = true
+            state.isLoggedIn = true
 
             localStorage.setItem('IsToken', authResponse.data.token)
             localStorage.setItem('userIDToken', authResponse.data.userId)
@@ -46,7 +47,7 @@ export const useUsers = () => {
 
         catch (err) {
             error.value = (err as Error).message || "An error occurred during login";
-            isLoggedIn.value = false
+            state.isLoggedIn = false
             
         }
     }
@@ -87,7 +88,7 @@ const registerUser = async (name: string, email: string, password: string): Prom
     const logout = (): void => {
         token.value = null;
         user.value = null;
-        isLoggedIn.value = false;
+        state.isLoggedIn = false;
         localStorage.removeItem('IsToken');
         console.log('User is logged out');
     }
@@ -97,7 +98,7 @@ const registerUser = async (name: string, email: string, password: string): Prom
 
     return {
         token,
-        isLoggedIn, 
+        isLoggedIn: state.isLoggedIn, 
         error,
         user,
         name,
