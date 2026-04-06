@@ -18,6 +18,7 @@
 
 
         <!-- Routerlink to orders -->
+          <RouterLink v-if="isLoggedIn" to="/orders" class="mx-4">Orders</RouterLink>
 
 
       </nav>
